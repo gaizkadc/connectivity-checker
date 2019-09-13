@@ -9,6 +9,6 @@ FROM iron/go
 RUN mkdir /nalej
 
 # Now just add the binary
-COPY example-app /nalej/
+COPY connectivity-checker /nalej/
 
-ENTRYPOINT ["./nalej/example-app"]
+ENTRYPOINT ["./nalej/connectivity-checker"]

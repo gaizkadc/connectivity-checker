@@ -1,31 +1,31 @@
 ###
-# Application example
+# connectivity-checker
 ###
 
 kind: Deployment
 apiVersion: apps/v1
 metadata:
   labels:
-    cluster: management
-    component: example
-  name: example
+    cluster: application
+    component: connectivity-checker
+  name: connectivity-checker
   namespace: __NPH_NAMESPACE
 spec:
   replicas: 1
   revisionHistoryLimit: 10
   selector:
     matchLabels:
-      cluster: management
-      component: example
+      cluster: application
+      component: connectivity-checker
   template:
     metadata:
       labels:
-        cluster: management
-        component: example
+        cluster: application
+        component: connectivity-checker
     spec:
       containers:
-      - name: example
-        image: __NPH_REGISTRY/__NPH_REGISTRY_NAMESPACE/example-app:__NPH_VERSION
+      - name: connectivity-checker
+        image: __NPH_REGISTRY/__NPH_REGISTRY_NAMESPACE/connectivity-checker:__NPH_VERSION
         imagePullPolicy: Always
         securityContext:
           runAsUser: 2000
