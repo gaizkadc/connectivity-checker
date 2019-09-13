@@ -17,6 +17,7 @@ var runCmd = &cobra.Command{
 	Long:  `Run connectivity-checker`,
 	Run: func(cmd *cobra.Command, args []string) {
 		SetupLogging()
+		RunConnectivityChecker()
 	},
 }
 
@@ -25,7 +26,7 @@ func init() {
 	rootCmd.AddCommand(runCmd)
 }
 
-func RunConnectivityManager() {
+func RunConnectivityChecker() {
 	// Incoming requests port
 	var port uint32
 	// Debug flag
@@ -39,7 +40,10 @@ func RunConnectivityManager() {
 		Debug: debug,
 	}
 
-	log.Info().Msg("Launching connectivity-manager!")
-	server, _ := server.NewService(&config)
+	log.Info().Msg("Launching connectivity-checker!")
+	server, err := server.NewService(&config)
+	if err != nil {
+		log.Fatal().Err(err).Msg("error creating connectivity-checker")
+	}
 	server.Run()
 }
