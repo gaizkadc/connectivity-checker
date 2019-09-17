@@ -1,5 +1,5 @@
 ###
-# Application example
+# connectivity-checker
 ###
 
 kind: Deployment
@@ -7,8 +7,8 @@ apiVersion: apps/v1
 metadata:
   labels:
     cluster: application
-    component: example
-  name: example
+    component: connectivity-checker
+  name: connectivity-checker
   namespace: __NPH_NAMESPACE
 spec:
   replicas: 1
@@ -16,17 +16,21 @@ spec:
   selector:
     matchLabels:
       cluster: application
-      component: example
+      component: connectivity-checker
   template:
     metadata:
       labels:
         cluster: application
-        component: example
+        component: connectivity-checker
     spec:
       containers:
-      - name: example
-        image: __NPH_REGISTRY/__NPH_REGISTRY_NAMESPACE/example-app:__NPH_VERSION
+      - name: connectivity-checker
+        image: __NPH_REGISTRY/__NPH_REGISTRY_NAMESPACE/connectivity-checker:__NPH_VERSION
         imagePullPolicy: Always
+        args:
+          - "run"
+          - "--debug"
+          - "--port=8384"
         securityContext:
           runAsUser: 2000
       imagePullSecrets:

@@ -1,12 +1,12 @@
 /*
- * Copyright (C) 2018 Nalej - All Rights Reserved
+ * Copyright (C) 2019 Nalej - All Rights Reserved
  */
 
 package main
 
 import (
-	"github.com/nalej/golang-template/cmd/other-app/commands"
-	"github.com/nalej/golang-template/version"
+	"github.com/nalej/connectivity-checker/cmd/connectivity-checker/commands"
+	"github.com/nalej/connectivity-checker/version"
 )
 
 var MainVersion string
