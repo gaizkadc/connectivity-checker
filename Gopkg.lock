@@ -190,6 +190,14 @@
   version = "v0.0.30"
 
 [[projects]]
+  digest = "1:01e194c59e474b1f240f44b629f044abbc194e4aed769a52f0644efa2251fcb3"
+  name = "github.com/nalej/grpc-login-api-go"
+  packages = ["."]
+  pruneopts = ""
+  revision = "8effe762852336522ff88c99111ea358e1068098"
+  version = "v0.0.22"
+
+[[projects]]
   digest = "1:f41783cc6d03c6734fe9bb8b42ca4aa87651430e98cd8fe0ad5c72ca30da2efa"
   name = "github.com/nalej/grpc-network-go"
   packages = ["."]
@@ -421,16 +429,22 @@
   analyzer-version = 1
   input-imports = [
     "github.com/nalej/derrors",
+    "github.com/nalej/grpc-authx-go",
     "github.com/nalej/grpc-cluster-api-go",
     "github.com/nalej/grpc-common-go",
     "github.com/nalej/grpc-infrastructure-go",
+    "github.com/nalej/grpc-login-api-go",
     "github.com/nalej/grpc-utils/pkg/conversions",
     "github.com/rs/zerolog",
     "github.com/rs/zerolog/log",
     "github.com/spf13/cobra",
     "github.com/spf13/viper",
     "google.golang.org/grpc",
+    "google.golang.org/grpc/codes",
+    "google.golang.org/grpc/credentials",
+    "google.golang.org/grpc/metadata",
     "google.golang.org/grpc/reflection",
+    "google.golang.org/grpc/status",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1
