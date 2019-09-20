@@ -76,8 +76,9 @@ spec:
               key: cluster_id
         - name: ORGANIZATION_ID
           valueFrom:
-            secretKeyRef: cluster-config
-              name: organization_id
+            configMapKeyRef:
+              name: cluster-config
+              key: organization_id
         volumeMounts:
         - name: config
           mountPath: /nalej/config

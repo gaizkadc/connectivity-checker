@@ -9,6 +9,7 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 	"time"
+	"os"
 )
 
 var config = server.Config{}
@@ -42,6 +43,8 @@ func init() {
 
 func RunConnectivityChecker() {
 	log.Info().Msg("Launching connectivity-checker!")
+	config.ClusterId = os.Getenv("CLUSTER_ID")
+	config.OrganizationId = os.Getenv("ORGANIZATION_ID")
 	server, err := server.NewService(config)
 	if err != nil {
 		log.Fatal().Err(err).Msg("error creating connectivity-checker")

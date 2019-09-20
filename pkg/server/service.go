@@ -158,7 +158,7 @@ func(s *Service) Run () {
 		ClusterId: s.Configuration.ClusterId,
 		OrganizationId: s.Configuration.OrganizationId,
 	}
-	go connectivity_checker.CheckCheckCheck(*connectivityCheckerHandler, ctx, clusterId, s.Configuration.ConnectivityCheckPeriod)
+	go connectivity_checker.CheckCheckCheck(connectivityCheckerHandler, ctx, clusterId, s.Configuration.ConnectivityCheckPeriod)
 
 	// Run
 	log.Info().Int("port", s.Configuration.Port).Msg("Launching gRPC server")
