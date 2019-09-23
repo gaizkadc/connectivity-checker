@@ -37,6 +37,8 @@ spec:
           - "--loginPort=443"
           - "--email=$(EMAIL)"
           - "--password=$(PASSWORD)"
+          - "--clusterId=$(CLUSTER_ID)"
+          - "--organizationId=$(ORGANIZATION_ID)"
           - "--useTLSForLogin=true"
           - "--caCertPath=/nalej/ca-certificate/ca.crt"
           - "--clientCertPath=/nalej/tls-client-certificate/"

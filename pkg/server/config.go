@@ -60,7 +60,7 @@ func (conf *Config) Validate() derrors.Error {
 	if conf.ClusterId == "" {
 		return derrors.NewInvalidArgumentError("cluster id must be set")
 	}
-	if conf.ClusterId == "" {
+	if conf.OrganizationId == "" {
 		return derrors.NewInvalidArgumentError("organization id must be set")
 	}
 	if conf.ClientCertPath == "" {

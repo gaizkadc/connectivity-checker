@@ -9,7 +9,6 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 	"time"
-	"os"
 )
 
 var config = server.Config{}
@@ -35,6 +34,8 @@ func init() {
 	runCmd.Flags().StringVar(&config.Password, "password", "", "password")
 	runCmd.Flags().StringVar(&config.CACertPath, "caCertPath", "", "Path for the CA certificate")
 	runCmd.Flags().StringVar(&config.ClientCertPath, "clientCertPath", "", "Path for the client certificate")
+	runCmd.Flags().StringVar(&config.ClusterId, "clusterId", "", "Cluster ID")
+	runCmd.Flags().StringVar(&config.OrganizationId, "organizationId", "", "Organization ID")
 	runCmd.Flags().BoolVar(&config.SkipServerCertValidation, "skipServerCertValidation", true, "Skip CA authentication validation")
 	runCmd.Flags().DurationVar(&config.ConnectivityCheckPeriod, "connectivityCheckPeriod", time.Duration(30)*time.Second, "connectivity Check Period")
 	runCmd.Flags().DurationVar(&config.ConnectivityGracePeriod, "connectivityGracePeriod", time.Duration(120)*time.Second, "connectivity Grace Period")
@@ -43,8 +44,6 @@ func init() {
 
 func RunConnectivityChecker() {
 	log.Info().Msg("Launching connectivity-checker!")
-	config.ClusterId = os.Getenv("CLUSTER_ID")
-	config.OrganizationId = os.Getenv("ORGANIZATION_ID")
 	server, err := server.NewService(config)
 	if err != nil {
 		log.Fatal().Err(err).Msg("error creating connectivity-checker")

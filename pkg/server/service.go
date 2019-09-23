@@ -142,8 +142,8 @@ func(s *Service) Run () {
 	connectivityCheckerManager := connectivity_checker.NewManager(connectivityCheckerClient, clusterAPILoginHelper)
 	connectivityCheckerHandler := connectivity_checker.NewHandler(connectivityCheckerManager)
 
-	grpcServer := grpc.NewServer()
-	grpc_cluster_api_go.RegisterConnectivityCheckerServer(grpcServer, connectivityCheckerHandler)
+	//grpcServer := grpc.NewServer()
+	//grpc_cluster_api_go.RegisterConnectivityCheckerServer(grpcServer, connectivityCheckerHandler)
 
 	// Register reflection service on gRPC server
 	if s.Configuration.Debug {
@@ -158,7 +158,7 @@ func(s *Service) Run () {
 		ClusterId: s.Configuration.ClusterId,
 		OrganizationId: s.Configuration.OrganizationId,
 	}
-	go connectivity_checker.CheckCheckCheck(connectivityCheckerHandler, ctx, clusterId, s.Configuration.ConnectivityCheckPeriod)
+	go connectivity_checker.CheckClusterConnectivity(connectivityCheckerHandler, ctx, clusterId, s.Configuration.ConnectivityCheckPeriod)
 
 	// Run
 	log.Info().Int("port", s.Configuration.Port).Msg("Launching gRPC server")
