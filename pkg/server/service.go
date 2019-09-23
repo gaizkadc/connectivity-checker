@@ -46,13 +46,13 @@ type Clients struct {
 
 func (s *Service) GetClients() (*Clients, derrors.Error) {
 
-	ccConn, err := s.getSecureAPIConnection(s.Configuration.ClusterAPIHostname, int(s.Configuration.ClusterAPIPort), s.Configuration.CACertPath, s.Configuration.ClientCertPath, s.Configuration.SkipServerCertValidation)
+	ccConn, err := s.getSecureAPIConnection(s.Configuration.ClusterAPIHostname, s.Configuration.ClusterAPIPort, s.Configuration.CACertPath, s.Configuration.ClientCertPath, s.Configuration.SkipServerCertValidation)
 	if err != nil {
 		return nil, derrors.AsError(err, "cannot create connection with the Cluster API manager")
 	}
 	connectivityCheckerClient := grpc_cluster_api_go.NewConnectivityCheckerClient(ccConn)
 
-	loginConn, err := s.getSecureAPIConnection(s.Configuration.LoginHostname, int(s.Configuration.LoginPort), s.Configuration.CACertPath, s.Configuration.ClientCertPath, s.Configuration.SkipServerCertValidation)
+	loginConn, err := s.getSecureAPIConnection(s.Configuration.LoginHostname, s.Configuration.LoginPort, s.Configuration.CACertPath, s.Configuration.ClientCertPath, s.Configuration.SkipServerCertValidation)
 	if err != nil {
 		return nil, derrors.AsError(err, "cannot create connection with the Login API manager")
 	}
@@ -131,7 +131,7 @@ func(s *Service) Run () {
 	}
 
 	connectivityCheckerClient := clients.ConnectivityCheckerClient
-	clusterAPILoginHelper := login_helper.NewLogin(s.Configuration.LoginHostname, int(s.Configuration.LoginPort), s.Configuration.UseTLSForLogin,
+	clusterAPILoginHelper := login_helper.NewLogin(s.Configuration.LoginHostname, s.Configuration.LoginPort, s.Configuration.UseTLSForLogin,
 		s.Configuration.Email, s.Configuration.Password, s.Configuration.CACertPath, s.Configuration.ClientCertPath, s.Configuration.SkipServerCertValidation)
 
 	lErr := clusterAPILoginHelper.Login()
@@ -139,26 +139,20 @@ func(s *Service) Run () {
 		log.Fatal().Str("err", cErr.DebugReport()).Msg("there was an error requesting cluster-api login")
 	}
 
-	connectivityCheckerManager := connectivity_checker.NewManager(connectivityCheckerClient, clusterAPILoginHelper)
-	connectivityCheckerHandler := connectivity_checker.NewHandler(connectivityCheckerManager)
-
-	//grpcServer := grpc.NewServer()
-	//grpc_cluster_api_go.RegisterConnectivityCheckerServer(grpcServer, connectivityCheckerHandler)
-
 	// Register reflection service on gRPC server
 	if s.Configuration.Debug {
 		reflection.Register(s.Server)
 	}
 
 	// Infinite loop of checks
-	ctx, _ := clusterAPILoginHelper.GetContext()
+
 	log.Debug().Str("cluster id", s.Configuration.ClusterId).Msg("cluster id")
 	log.Debug().Dur("connectivity check period", s.Configuration.ConnectivityCheckPeriod).Msg("ConnectivityCheckPeriod")
 	clusterId :=  &grpc_infrastructure_go.ClusterId{
 		ClusterId: s.Configuration.ClusterId,
 		OrganizationId: s.Configuration.OrganizationId,
 	}
-	go connectivity_checker.CheckClusterConnectivity(connectivityCheckerHandler, ctx, clusterId, s.Configuration.ConnectivityCheckPeriod)
+	go connectivity_checker.CheckClusterConnectivity(connectivityCheckerClient, *clusterAPILoginHelper, clusterId, s.Configuration.ConnectivityCheckPeriod)
 
 	// Run
 	log.Info().Int("port", s.Configuration.Port).Msg("Launching gRPC server")
