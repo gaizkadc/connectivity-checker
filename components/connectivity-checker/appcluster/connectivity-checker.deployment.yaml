@@ -31,7 +31,76 @@ spec:
           - "run"
           - "--debug"
           - "--port=8384"
+          - "--clusterAPIHostname=$(CLUSTER_API_HOST)"
+          - "--clusterAPIPort=443"
+          - "--loginHostname=$(LOGIN_API_HOST)"
+          - "--loginPort=443"
+          - "--email=$(EMAIL)"
+          - "--password=$(PASSWORD)"
+          - "--clusterId=$(CLUSTER_ID)"
+          - "--organizationId=$(ORGANIZATION_ID)"
+          - "--useTLSForLogin=true"
+          - "--caCertPath=/nalej/ca-certificate/ca.crt"
+          - "--clientCertPath=/nalej/tls-client-certificate/"
+          - "--skipServerCertValidation=false"
         securityContext:
           runAsUser: 2000
+        env:
+        - name: CLUSTER_API_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: cluster-config
+              key: cluster_api_hostname
+        - name: LOGIN_API_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: cluster-config
+              key: login_api_hostname
+        - name: CLUSTER_PUBLIC_HOSTNAME
+          valueFrom:
+            configMapKeyRef:
+              name: cluster-config
+              key: cluster_public_hostname
+        - name: EMAIL
+          valueFrom:
+            secretKeyRef:
+              name: cluster-user-credentials
+              key: email
+        - name: PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: cluster-user-credentials
+              key: password
+        - name: CLUSTER_ID
+          valueFrom:
+            configMapKeyRef:
+              name: cluster-config
+              key: cluster_id
+        - name: ORGANIZATION_ID
+          valueFrom:
+            configMapKeyRef:
+              name: cluster-config
+              key: organization_id
+        volumeMounts:
+        - name: config
+          mountPath: /nalej/config
+          readOnly: true
+        - name: tls-client-certificate-volume
+          readOnly: true
+          mountPath: /nalej/tls-client-certificate
+        - name: ca-certificate-volume
+          readOnly: true
+          mountPath: /nalej/ca-certificate
+      volumes:
+      - name: config
+        configMap:
+          defaultMode: 0644
+          name: device-controller-authx-config
+      - name: tls-client-certificate-volume
+        secret:
+          secretName: tls-client-certificate
+      - name: ca-certificate-volume
+        secret:
+          secretName: ca-certificate
       imagePullSecrets:
       - name: nalej-registry
