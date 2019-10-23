@@ -115,6 +115,14 @@
   version = "v0.0.92"
 
 [[projects]]
+  digest = "1:3efed612f5abd564fb8a67232e6512c94595879e9eae78fb5d99e499d0595a9d"
+  name = "github.com/nalej/grpc-connectivity-manager-go"
+  packages = ["."]
+  pruneopts = ""
+  revision = "6356ce4ee26d171c3b2ac47203a2e36f35875406"
+  version = "v0.0.3"
+
+[[projects]]
   digest = "1:0bad099051ea5df46222752d38f98673d2ccec88ab40e30a9ec3d1473cbcd634"
   name = "github.com/nalej/grpc-device-controller-go"
   packages = ["."]
@@ -337,7 +345,7 @@
     "github.com/nalej/derrors",
     "github.com/nalej/grpc-authx-go",
     "github.com/nalej/grpc-cluster-api-go",
-    "github.com/nalej/grpc-common-go",
+    "github.com/nalej/grpc-connectivity-manager-go",
     "github.com/nalej/grpc-infrastructure-go",
     "github.com/nalej/grpc-login-api-go",
     "github.com/nalej/grpc-utils/pkg/conversions",

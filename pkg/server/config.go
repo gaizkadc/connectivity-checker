@@ -8,6 +8,7 @@ import (
 	"github.com/nalej/connectivity-checker/version"
 	"github.com/nalej/derrors"
 	"github.com/rs/zerolog/log"
+	grpc_connectivity_manager_go "github.com/nalej/grpc-connectivity-manager-go"
 	"strings"
 	"time"
 )
@@ -45,6 +46,8 @@ type Config struct {
 	ClusterId string
 	// Organization ID
 	OrganizationId string
+	// Offline Policy must be set to true when a cluster is offline thus an offline policy should be triggered
+	OfflinePolicy grpc_connectivity_manager_go.OfflinePolicy
 }
 
 func (conf *Config) Validate() derrors.Error {

@@ -8,10 +8,13 @@ import (
 	"github.com/nalej/connectivity-checker/pkg/server"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
+	grpc_connectivity_manager_go "github.com/nalej/grpc-connectivity-manager-go"
+	"strings"
 	"time"
 )
 
 var config = server.Config{}
+var policyName string
 
 var runCmd = &cobra.Command{
 	Use:   "run",
@@ -39,10 +42,17 @@ func init() {
 	runCmd.Flags().BoolVar(&config.SkipServerCertValidation, "skipServerCertValidation", true, "Skip CA authentication validation")
 	runCmd.Flags().DurationVar(&config.ConnectivityCheckPeriod, "connectivityCheckPeriod", time.Duration(30)*time.Second, "connectivity Check Period")
 	runCmd.Flags().DurationVar(&config.ConnectivityGracePeriod, "connectivityGracePeriod", time.Duration(120)*time.Second, "connectivity Grace Period")
+	runCmd.Flags().StringVar(&policyName, "offlinePolicy", "none", "Offline policy to trigger when cordoning an offline cluster: none or drain")
 	rootCmd.AddCommand(runCmd)
 }
 
 func RunConnectivityChecker() {
+	policy, exists := grpc_connectivity_manager_go.OfflinePolicy_value[strings.ToUpper(policyName)]
+	if ! exists{
+		log.Error().Msg("invalid offline policy set")
+	}
+	config.OfflinePolicy = grpc_connectivity_manager_go.OfflinePolicy(policy)
+
 	log.Info().Msg("Launching connectivity-checker!")
 	server, err := server.NewService(config)
 	if err != nil {
