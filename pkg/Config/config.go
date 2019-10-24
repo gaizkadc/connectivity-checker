@@ -2,7 +2,7 @@
  * Copyright (C) 2019 Nalej - All Rights Reserved
  */
 
-package server
+package Config
 
 import (
 	"github.com/nalej/connectivity-checker/version"

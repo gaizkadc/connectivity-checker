@@ -5,15 +5,16 @@
 package commands
 
 import (
+	"github.com/nalej/connectivity-checker/pkg/Config"
 	"github.com/nalej/connectivity-checker/pkg/server"
+	grpc_connectivity_manager_go "github.com/nalej/grpc-connectivity-manager-go"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
-	grpc_connectivity_manager_go "github.com/nalej/grpc-connectivity-manager-go"
 	"strings"
 	"time"
 )
 
-var config = server.Config{}
+var config = Config.Config{}
 var policyName string
 
 var runCmd = &cobra.Command{

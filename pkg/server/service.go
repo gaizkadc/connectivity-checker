@@ -8,10 +8,12 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
+	"github.com/nalej/connectivity-checker/pkg/Config"
 	"github.com/nalej/connectivity-checker/pkg/login_helper"
 	"github.com/nalej/connectivity-checker/pkg/server/connectivity-checker"
 	"github.com/nalej/derrors"
 	"github.com/nalej/grpc-cluster-api-go"
+	grpc_deployment_manager_go "github.com/nalej/grpc-deployment-manager-go"
 	grpc_infrastructure_go "github.com/nalej/grpc-infrastructure-go"
 	"github.com/nalej/grpc-login-api-go"
 	"github.com/rs/zerolog/log"
@@ -20,16 +22,17 @@ import (
 	"google.golang.org/grpc/reflection"
 	"io/ioutil"
 	"net"
+	"time"
 )
 
 type Service struct {
 	// Server for incoming requests
 	Server *grpc.Server
 	// Configuration object
-	Configuration Config
+	Configuration Config.Config
 }
 
-func NewService(config Config) (*Service, error) {
+func NewService(config Config.Config) (*Service, error) {
 	server := grpc.NewServer()
 	service := &Service{
 		Server:             server,
@@ -42,6 +45,7 @@ func NewService(config Config) (*Service, error) {
 type Clients struct {
 	ConnectivityCheckerClient grpc_cluster_api_go.ConnectivityCheckerClient
 	LoginClient  grpc_login_api_go.LoginClient
+	OfflinePolicyClient grpc_deployment_manager_go.OfflinePolicyClient
 }
 
 func (s *Service) GetClients() (*Clients, derrors.Error) {
@@ -58,7 +62,13 @@ func (s *Service) GetClients() (*Clients, derrors.Error) {
 	}
 	loginClient := grpc_login_api_go.NewLoginClient(loginConn)
 
-	return &Clients{ConnectivityCheckerClient:connectivityCheckerClient, LoginClient:loginClient}, nil
+	opConn, err := s.getSecureAPIConnection(s.Configuration.LoginHostname, s.Configuration.LoginPort, s.Configuration.CACertPath, s.Configuration.ClientCertPath, s.Configuration.SkipServerCertValidation)
+	if err != nil {
+		return nil, derrors.AsError(err, "cannot create connection with the Deployment Manager")
+	}
+	opClient := grpc_deployment_manager_go.NewOfflinePolicyClient(opConn)
+
+	return &Clients{ConnectivityCheckerClient:connectivityCheckerClient, LoginClient:loginClient, OfflinePolicyClient:opClient}, nil
 }
 
 func (s *Service) getSecureAPIConnection(hostname string, port int, caCertPath string, clientCertPath string, skipCAValidation bool) (*grpc.ClientConn, derrors.Error) {
@@ -113,6 +123,7 @@ func (s *Service) getSecureAPIConnection(hostname string, port int, caCertPath s
 }
 
 func(s *Service) Run () {
+	var lastAliveTimestamp time.Time
 	cErr := s.Configuration.Validate()
 	if cErr != nil {
 		log.Fatal().Str("err", cErr.DebugReport()).Msg("invalid configuration")
@@ -133,6 +144,7 @@ func(s *Service) Run () {
 	connectivityCheckerClient := clients.ConnectivityCheckerClient
 	clusterAPILoginHelper := login_helper.NewLogin(s.Configuration.LoginHostname, s.Configuration.LoginPort, s.Configuration.UseTLSForLogin,
 		s.Configuration.Email, s.Configuration.Password, s.Configuration.CACertPath, s.Configuration.ClientCertPath, s.Configuration.SkipServerCertValidation)
+	opClient := clients.OfflinePolicyClient
 
 	lErr := clusterAPILoginHelper.Login()
 	if lErr != nil {
@@ -144,15 +156,21 @@ func(s *Service) Run () {
 		reflection.Register(s.Server)
 	}
 
-	// Infinite loop of checks
-
+	// Infinite loop of ClusterAlive signals
 	log.Debug().Str("cluster id", s.Configuration.ClusterId).Msg("cluster id")
 	log.Debug().Dur("connectivity check period", s.Configuration.ConnectivityCheckPeriod).Msg("ConnectivityCheckPeriod")
 	clusterId :=  &grpc_infrastructure_go.ClusterId{
 		ClusterId: s.Configuration.ClusterId,
 		OrganizationId: s.Configuration.OrganizationId,
 	}
-	go connectivity_checker.CheckClusterConnectivity(connectivityCheckerClient, *clusterAPILoginHelper, clusterId, s.Configuration.ConnectivityCheckPeriod)
+	go connectivity_checker.CheckClusterConnectivity(connectivityCheckerClient, *clusterAPILoginHelper, clusterId, s.Configuration.ConnectivityCheckPeriod, lastAliveTimestamp)
+
+	// Infinite loop of grace period expiration checks
+	ccManager, nmErr := connectivity_checker.NewManager(&opClient, s.Configuration)
+	if nmErr != nil {
+		log.Error().Err(nmErr).Msg("error creating connectivity-checker client")
+	}
+	go ccManager.CheckGracePeriodExpiration(lastAliveTimestamp, opClient, s.Configuration.ConnectivityCheckPeriod)
 
 	// Run
 	log.Info().Int("port", s.Configuration.Port).Msg("Launching gRPC server")

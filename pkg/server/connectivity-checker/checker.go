@@ -6,15 +6,15 @@ package connectivity_checker
 
 import (
 	"github.com/nalej/connectivity-checker/pkg/login_helper"
-	"github.com/nalej/grpc-infrastructure-go"
 	"github.com/nalej/grpc-cluster-api-go"
+	"github.com/nalej/grpc-infrastructure-go"
 	"github.com/rs/zerolog/log"
 	"google.golang.org/grpc/codes"
 	grpc_status "google.golang.org/grpc/status"
 	"time"
 )
 
-func CheckClusterConnectivity (connectivityCheckerClient grpc_cluster_api_go.ConnectivityCheckerClient, clusterAPILoginHelper login_helper.LoginHelper, clusterId *grpc_infrastructure_go.ClusterId, duration time.Duration) {
+func CheckClusterConnectivity (connectivityCheckerClient grpc_cluster_api_go.ConnectivityCheckerClient, clusterAPILoginHelper login_helper.LoginHelper, clusterId *grpc_infrastructure_go.ClusterId, duration time.Duration, lastAliveTimestamp time.Time) {
 	for true {
 		ctx, cancel := clusterAPILoginHelper.GetContext()
 		if cancel != nil {
@@ -35,11 +35,14 @@ func CheckClusterConnectivity (connectivityCheckerClient grpc_cluster_api_go.Con
 					log.Error().Err(err).Msg("cluster doesn't seem to be alive")
 				} else {
 					log.Debug().Msg("cluster is alive")
+					lastAliveTimestamp = time.Now()
 				}
 			}
 		} else {
 			log.Debug().Msg("cluster is alive")
+			lastAliveTimestamp = time.Now()
 		}
 		time.Sleep(duration)
 	}
 }
+
