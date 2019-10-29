@@ -33,6 +33,8 @@ func init() {
 	runCmd.Flags().IntVar(&config.ClusterAPIPort, "clusterAPIPort", 8000, "Port where the cluster API is listening")
 	runCmd.Flags().StringVar(&config.LoginHostname, "loginHostname", "", "Hostname of the login service")
 	runCmd.Flags().IntVar(&config.LoginPort, "loginPort", 31683, "port where the login service is listening")
+	runCmd.Flags().StringVar(&config.DeploymentManagerHostname, "deploymentManagerHostname", "", "Hostname of the deployment-manager service")
+	runCmd.Flags().IntVar(&config.DeploymentManagerPort, "deploymentManagerPort", 2500, "port where the deployment-manager service is listening")
 	runCmd.Flags().BoolVar(&config.UseTLSForLogin, "useTLSForLogin", true, "Use TLS to connect to the Login API")
 	runCmd.Flags().StringVar(&config.Email, "email", "", "email address")
 	runCmd.Flags().StringVar(&config.Password, "password", "", "password")

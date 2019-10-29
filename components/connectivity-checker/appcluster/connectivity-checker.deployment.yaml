@@ -35,6 +35,8 @@ spec:
           - "--clusterAPIPort=443"
           - "--loginHostname=$(LOGIN_API_HOST)"
           - "--loginPort=443"
+          - "--deploymentManagerHostname=$(DEPLOYMENT_MANAGER_SERVICE_HOST)"
+          - "--deploymentManagerPort=$(DEPLOYMENT_MANAGER_SERVICE_PORT_API)"
           - "--email=$(EMAIL)"
           - "--password=$(PASSWORD)"
           - "--clusterId=$(CLUSTER_ID)"
@@ -43,6 +45,7 @@ spec:
           - "--caCertPath=/nalej/ca-certificate/ca.crt"
           - "--clientCertPath=/nalej/tls-client-certificate/"
           - "--skipServerCertValidation=false"
+          - "--offlinePolicy=none"
         securityContext:
           runAsUser: 2000
         env:

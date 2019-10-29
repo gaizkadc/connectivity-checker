@@ -13,8 +13,8 @@ import (
 	"github.com/nalej/connectivity-checker/pkg/server/connectivity-checker"
 	"github.com/nalej/derrors"
 	"github.com/nalej/grpc-cluster-api-go"
-	grpc_deployment_manager_go "github.com/nalej/grpc-deployment-manager-go"
-	grpc_infrastructure_go "github.com/nalej/grpc-infrastructure-go"
+	"github.com/nalej/grpc-deployment-manager-go"
+	"github.com/nalej/grpc-infrastructure-go"
 	"github.com/nalej/grpc-login-api-go"
 	"github.com/rs/zerolog/log"
 	"google.golang.org/grpc"
@@ -22,7 +22,6 @@ import (
 	"google.golang.org/grpc/reflection"
 	"io/ioutil"
 	"net"
-	"time"
 )
 
 type Service struct {
@@ -62,9 +61,10 @@ func (s *Service) GetClients() (*Clients, derrors.Error) {
 	}
 	loginClient := grpc_login_api_go.NewLoginClient(loginConn)
 
-	opConn, err := s.getSecureAPIConnection(s.Configuration.LoginHostname, s.Configuration.LoginPort, s.Configuration.CACertPath, s.Configuration.ClientCertPath, s.Configuration.SkipServerCertValidation)
-	if err != nil {
-		return nil, derrors.AsError(err, "cannot create connection with the Deployment Manager")
+	deployMentManagerAddress := fmt.Sprintf("%s:%d", s.Configuration.DeploymentManagerHostname, s.Configuration.DeploymentManagerPort)
+	opConn, opErr := grpc.Dial(deployMentManagerAddress, grpc.WithInsecure())
+	if opErr != nil {
+		return nil, derrors.AsError(opErr, "cannot create connection with the Deployment Manager")
 	}
 	opClient := grpc_deployment_manager_go.NewOfflinePolicyClient(opConn)
 
@@ -123,7 +123,6 @@ func (s *Service) getSecureAPIConnection(hostname string, port int, caCertPath s
 }
 
 func(s *Service) Run () {
-	var lastAliveTimestamp time.Time
 	cErr := s.Configuration.Validate()
 	if cErr != nil {
 		log.Fatal().Str("err", cErr.DebugReport()).Msg("invalid configuration")
@@ -156,21 +155,14 @@ func(s *Service) Run () {
 		reflection.Register(s.Server)
 	}
 
-	// Infinite loop of ClusterAlive signals
+	// Infinite loop of ClusterAlive signalsa and grace expiration checks
 	log.Debug().Str("cluster id", s.Configuration.ClusterId).Msg("cluster id")
 	log.Debug().Dur("connectivity check period", s.Configuration.ConnectivityCheckPeriod).Msg("ConnectivityCheckPeriod")
 	clusterId :=  &grpc_infrastructure_go.ClusterId{
 		ClusterId: s.Configuration.ClusterId,
 		OrganizationId: s.Configuration.OrganizationId,
 	}
-	go connectivity_checker.CheckClusterConnectivity(connectivityCheckerClient, *clusterAPILoginHelper, clusterId, s.Configuration.ConnectivityCheckPeriod, lastAliveTimestamp)
-
-	// Infinite loop of grace period expiration checks
-	ccManager, nmErr := connectivity_checker.NewManager(&opClient, s.Configuration)
-	if nmErr != nil {
-		log.Error().Err(nmErr).Msg("error creating connectivity-checker client")
-	}
-	go ccManager.CheckGracePeriodExpiration(lastAliveTimestamp, opClient, s.Configuration.ConnectivityCheckPeriod)
+	go connectivity_checker.CheckClusterConnectivity(connectivityCheckerClient, *clusterAPILoginHelper, clusterId, s.Configuration.ConnectivityCheckPeriod, opClient, s.Configuration)
 
 	// Run
 	log.Info().Int("port", s.Configuration.Port).Msg("Launching gRPC server")

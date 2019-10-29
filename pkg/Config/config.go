@@ -8,7 +8,7 @@ import (
 	"github.com/nalej/connectivity-checker/version"
 	"github.com/nalej/derrors"
 	"github.com/rs/zerolog/log"
-	grpc_connectivity_manager_go "github.com/nalej/grpc-connectivity-manager-go"
+	"github.com/nalej/grpc-connectivity-manager-go"
 	"strings"
 	"time"
 )
@@ -26,6 +26,10 @@ type Config struct {
 	LoginHostname string
 	// LoginPort with the port where the login API is listening
 	LoginPort int
+	//DeploymentManagerHostname
+	DeploymentManagerHostname string
+	// DeploymentManagerPort
+	DeploymentManagerPort int
 	// Email to log into the management cluster.
 	Email string
 	// Password to log into the managment cluster.
@@ -78,6 +82,9 @@ func (conf *Config) Validate() derrors.Error {
 	if conf.LoginHostname == "" {
 		return derrors.NewInvalidArgumentError("login hostname must be set")
 	}
+	if conf.DeploymentManagerHostname == "" {
+		return derrors.NewInvalidArgumentError("deployment-manager hostname must be set")
+	}
 
 	return nil
 }
@@ -87,6 +94,7 @@ func (conf * Config) Print() {
 	log.Info().Int("port", conf.Port).Msg("gRPC port")
 	log.Info().Str("cluster api hostname", conf.ClusterAPIHostname).Int("port", conf.ClusterAPIPort).Msg("Cluster API on management cluster")
 	log.Info().Str("login hostname", conf.LoginHostname).Int("port", conf.LoginPort).Bool("UseTLSForLogin", conf.UseTLSForLogin).Msg("Login API on management cluster")
+	log.Info().Str("deployment-manager hostname", conf.DeploymentManagerHostname).Int("port", conf.DeploymentManagerPort).Msg("Deployment Manager hostname and port")
 	log.Info().Str("email", conf.Email).Str("password", strings.Repeat("*", len(conf.Password))).Msg("Application cluster credentials")
 	log.Info().Str("cluster id", conf.ClusterId).Msg("cluster id")
 	log.Info().Str("organization id ", conf.OrganizationId).Msg("organization id")
