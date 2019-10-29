@@ -8,7 +8,7 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
-	"github.com/nalej/connectivity-checker/pkg/Config"
+	"github.com/nalej/connectivity-checker/pkg/config"
 	"github.com/nalej/connectivity-checker/pkg/login_helper"
 	"github.com/nalej/connectivity-checker/pkg/server/connectivity-checker"
 	"github.com/nalej/derrors"
@@ -28,10 +28,10 @@ type Service struct {
 	// Server for incoming requests
 	Server *grpc.Server
 	// Configuration object
-	Configuration Config.Config
+	Configuration config.Config
 }
 
-func NewService(config Config.Config) (*Service, error) {
+func NewService(config config.Config) (*Service, error) {
 	server := grpc.NewServer()
 	service := &Service{
 		Server:             server,
@@ -61,8 +61,7 @@ func (s *Service) GetClients() (*Clients, derrors.Error) {
 	}
 	loginClient := grpc_login_api_go.NewLoginClient(loginConn)
 
-	deployMentManagerAddress := fmt.Sprintf("%s:%d", s.Configuration.DeploymentManagerHostname, s.Configuration.DeploymentManagerPort)
-	opConn, opErr := grpc.Dial(deployMentManagerAddress, grpc.WithInsecure())
+	opConn, opErr := grpc.Dial(s.Configuration.DeploymentManagerAddress, grpc.WithInsecure())
 	if opErr != nil {
 		return nil, derrors.AsError(opErr, "cannot create connection with the Deployment Manager")
 	}

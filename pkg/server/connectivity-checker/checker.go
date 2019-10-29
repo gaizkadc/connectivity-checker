@@ -6,12 +6,12 @@ package connectivity_checker
 
 import (
 	"context"
-	"github.com/nalej/connectivity-checker/pkg/Config"
+	"github.com/nalej/connectivity-checker/pkg/config"
 	"github.com/nalej/connectivity-checker/pkg/login_helper"
 	"github.com/nalej/grpc-cluster-api-go"
-	grpc_common_go "github.com/nalej/grpc-common-go"
-	grpc_connectivity_manager_go "github.com/nalej/grpc-connectivity-manager-go"
-	grpc_deployment_manager_go "github.com/nalej/grpc-deployment-manager-go"
+	"github.com/nalej/grpc-common-go"
+	"github.com/nalej/grpc-connectivity-manager-go"
+	"github.com/nalej/grpc-deployment-manager-go"
 	"github.com/nalej/grpc-infrastructure-go"
 	"github.com/rs/zerolog/log"
 	"google.golang.org/grpc/codes"
@@ -19,7 +19,7 @@ import (
 	"time"
 )
 
-func CheckClusterConnectivity (connectivityCheckerClient grpc_cluster_api_go.ConnectivityCheckerClient, clusterAPILoginHelper login_helper.LoginHelper, clusterId *grpc_infrastructure_go.ClusterId, duration time.Duration, opClient grpc_deployment_manager_go.OfflinePolicyClient,conf Config.Config) {
+func CheckClusterConnectivity (connectivityCheckerClient grpc_cluster_api_go.ConnectivityCheckerClient, clusterAPILoginHelper login_helper.LoginHelper, clusterId *grpc_infrastructure_go.ClusterId, duration time.Duration, opClient grpc_deployment_manager_go.OfflinePolicyClient,conf config.Config) {
 	var lastAliveTimestamp time.Time
 
 	for true {
@@ -59,7 +59,7 @@ func CheckClusterConnectivity (connectivityCheckerClient grpc_cluster_api_go.Con
 }
 
 // Checks if an OfflinePolicy is set and acts accordingly
-func triggerOfflinePolicy (conf Config.Config, opClient grpc_deployment_manager_go.OfflinePolicyClient) {
+func triggerOfflinePolicy (conf config.Config, opClient grpc_deployment_manager_go.OfflinePolicyClient) {
 	log.Debug().Msg("triggering offline policy")
 	switch conf.OfflinePolicy {
 	case grpc_connectivity_manager_go.OfflinePolicy_NONE:

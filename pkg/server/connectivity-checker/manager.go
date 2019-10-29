@@ -5,7 +5,7 @@
 package connectivity_checker
 
 import (
-	"github.com/nalej/connectivity-checker/pkg/Config"
+	"github.com/nalej/connectivity-checker/pkg/config"
 	grpc_deployment_manager_go "github.com/nalej/grpc-deployment-manager-go"
 	"time"
 )
@@ -18,6 +18,6 @@ const (
 type Manager struct {}
 
 // NewManager creates a new manager.
-func NewManager(opClient *grpc_deployment_manager_go.OfflinePolicyClient, config Config.Config) (*Manager, error) {
+func NewManager(opClient *grpc_deployment_manager_go.OfflinePolicyClient, config config.Config) (*Manager, error) {
 	return &Manager{}, nil
 }

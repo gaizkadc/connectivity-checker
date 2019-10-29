@@ -2,7 +2,7 @@
  * Copyright (C) 2019 Nalej - All Rights Reserved
  */
 
-package Config
+package config
 
 import (
 	"github.com/nalej/connectivity-checker/version"
@@ -26,10 +26,8 @@ type Config struct {
 	LoginHostname string
 	// LoginPort with the port where the login API is listening
 	LoginPort int
-	//DeploymentManagerHostname
-	DeploymentManagerHostname string
-	// DeploymentManagerPort
-	DeploymentManagerPort int
+	// DeploymentManagerAddress
+	DeploymentManagerAddress string
 	// Email to log into the management cluster.
 	Email string
 	// Password to log into the managment cluster.
