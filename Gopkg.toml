@@ -5,3 +5,15 @@
 [[constraint]]
     name="github.com/spf13/cobra"
     version="v0.0.3"
+
+[[constraint]]
+    name="github.com/nalej/grpc-connectivity-manager-go"
+    version="=v0.0.3"
+
+[[constraint]]
+    name="github.com/nalej/grpc-deployment-manager-go"
+    version="=v0.0.63"
+
+[[constraint]]
+    name="github.com/nalej/grpc-infrastructure-go"
+    version="=v0.0.44"
