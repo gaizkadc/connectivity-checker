@@ -80,8 +80,8 @@ func (conf *Config) Validate() derrors.Error {
 	if conf.LoginHostname == "" {
 		return derrors.NewInvalidArgumentError("login hostname must be set")
 	}
-	if conf.DeploymentManagerHostname == "" {
-		return derrors.NewInvalidArgumentError("deployment-manager hostname must be set")
+	if conf.DeploymentManagerAddress == "" {
+		return derrors.NewInvalidArgumentError("deployment-manager address must be set")
 	}
 
 	return nil
@@ -92,7 +92,7 @@ func (conf * Config) Print() {
 	log.Info().Int("port", conf.Port).Msg("gRPC port")
 	log.Info().Str("cluster api hostname", conf.ClusterAPIHostname).Int("port", conf.ClusterAPIPort).Msg("Cluster API on management cluster")
 	log.Info().Str("login hostname", conf.LoginHostname).Int("port", conf.LoginPort).Bool("UseTLSForLogin", conf.UseTLSForLogin).Msg("Login API on management cluster")
-	log.Info().Str("deployment-manager hostname", conf.DeploymentManagerHostname).Int("port", conf.DeploymentManagerPort).Msg("Deployment Manager hostname and port")
+	log.Info().Str("deployment-manager hostname", conf.DeploymentManagerAddress).Msg("Deployment Manager address")
 	log.Info().Str("email", conf.Email).Str("password", strings.Repeat("*", len(conf.Password))).Msg("Application cluster credentials")
 	log.Info().Str("cluster id", conf.ClusterId).Msg("cluster id")
 	log.Info().Str("organization id ", conf.OrganizationId).Msg("organization id")
