@@ -1,5 +1,17 @@
 /*
- * Copyright (C) 2019 Nalej Group - All Rights Reserved
+ * Copyright 2019 Nalej
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package connectivity_checker
@@ -19,7 +31,7 @@ import (
 	"time"
 )
 
-func CheckClusterConnectivity (connectivityCheckerClient grpc_cluster_api_go.ConnectivityCheckerClient, clusterAPILoginHelper login_helper.LoginHelper, clusterId *grpc_infrastructure_go.ClusterId, duration time.Duration, opClient grpc_deployment_manager_go.OfflinePolicyClient,conf config.Config) {
+func CheckClusterConnectivity(connectivityCheckerClient grpc_cluster_api_go.ConnectivityCheckerClient, clusterAPILoginHelper login_helper.LoginHelper, clusterId *grpc_infrastructure_go.ClusterId, duration time.Duration, opClient grpc_deployment_manager_go.OfflinePolicyClient, conf config.Config) {
 	var lastAliveTimestamp time.Time
 
 	for true {
@@ -51,7 +63,7 @@ func CheckClusterConnectivity (connectivityCheckerClient grpc_cluster_api_go.Con
 		}
 
 		// Check grace period expiration
-		if time.Now().Unix() - lastAliveTimestamp.Unix() > int64(conf.ConnectivityGracePeriod.Seconds()) {
+		if time.Now().Unix()-lastAliveTimestamp.Unix() > int64(conf.ConnectivityGracePeriod.Seconds()) {
 			triggerOfflinePolicy(conf, opClient)
 		}
 		time.Sleep(duration)
@@ -59,7 +71,7 @@ func CheckClusterConnectivity (connectivityCheckerClient grpc_cluster_api_go.Con
 }
 
 // Checks if an OfflinePolicy is set and acts accordingly
-func triggerOfflinePolicy (conf config.Config, opClient grpc_deployment_manager_go.OfflinePolicyClient) {
+func triggerOfflinePolicy(conf config.Config, opClient grpc_deployment_manager_go.OfflinePolicyClient) {
 	log.Debug().Msg("triggering offline policy")
 	switch conf.OfflinePolicy {
 	case grpc_connectivity_manager_go.OfflinePolicy_NONE:

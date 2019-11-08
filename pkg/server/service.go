@@ -1,5 +1,17 @@
 /*
- * Copyright (C) 2019 Nalej Group - All Rights Reserved
+ * Copyright 2019 Nalej
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package server
@@ -34,8 +46,8 @@ type Service struct {
 func NewService(config config.Config) (*Service, error) {
 	server := grpc.NewServer()
 	service := &Service{
-		Server:             server,
-		Configuration:      config,
+		Server:        server,
+		Configuration: config,
 	}
 
 	return service, nil
@@ -43,8 +55,8 @@ func NewService(config config.Config) (*Service, error) {
 
 type Clients struct {
 	ConnectivityCheckerClient grpc_cluster_api_go.ConnectivityCheckerClient
-	LoginClient  grpc_login_api_go.LoginClient
-	OfflinePolicyClient grpc_deployment_manager_go.OfflinePolicyClient
+	LoginClient               grpc_login_api_go.LoginClient
+	OfflinePolicyClient       grpc_deployment_manager_go.OfflinePolicyClient
 }
 
 func (s *Service) GetClients() (*Clients, derrors.Error) {
@@ -67,14 +79,14 @@ func (s *Service) GetClients() (*Clients, derrors.Error) {
 	}
 	opClient := grpc_deployment_manager_go.NewOfflinePolicyClient(opConn)
 
-	return &Clients{ConnectivityCheckerClient:connectivityCheckerClient, LoginClient:loginClient, OfflinePolicyClient:opClient}, nil
+	return &Clients{ConnectivityCheckerClient: connectivityCheckerClient, LoginClient: loginClient, OfflinePolicyClient: opClient}, nil
 }
 
 func (s *Service) getSecureAPIConnection(hostname string, port int, caCertPath string, clientCertPath string, skipCAValidation bool) (*grpc.ClientConn, derrors.Error) {
 	// Build connection with cluster API
 	rootCAs := x509.NewCertPool()
 	tlsConfig := &tls.Config{
-		ServerName:   hostname,
+		ServerName: hostname,
 	}
 
 	if caCertPath != "" {
@@ -95,7 +107,7 @@ func (s *Service) getSecureAPIConnection(hostname string, port int, caCertPath s
 
 	if clientCertPath != "" {
 		log.Debug().Str("clientCertPath", clientCertPath).Msg("loading client certificate")
-		clientCert, err := tls.LoadX509KeyPair(fmt.Sprintf("%s/tls.crt", clientCertPath),fmt.Sprintf("%s/tls.key", clientCertPath))
+		clientCert, err := tls.LoadX509KeyPair(fmt.Sprintf("%s/tls.crt", clientCertPath), fmt.Sprintf("%s/tls.key", clientCertPath))
 		if err != nil {
 			log.Error().Str("error", err.Error()).Msg("Error loading client certificate")
 			return nil, derrors.NewInternalError("Error loading client certificate")
@@ -121,7 +133,7 @@ func (s *Service) getSecureAPIConnection(hostname string, port int, caCertPath s
 	return sConn, nil
 }
 
-func(s *Service) Run () {
+func (s *Service) Run() {
 	cErr := s.Configuration.Validate()
 	if cErr != nil {
 		log.Fatal().Str("err", cErr.DebugReport()).Msg("invalid configuration")
@@ -157,8 +169,8 @@ func(s *Service) Run () {
 	// Infinite loop of ClusterAlive signalsa and grace expiration checks
 	log.Debug().Str("cluster id", s.Configuration.ClusterId).Msg("cluster id")
 	log.Debug().Dur("connectivity check period", s.Configuration.ConnectivityCheckPeriod).Msg("ConnectivityCheckPeriod")
-	clusterId :=  &grpc_infrastructure_go.ClusterId{
-		ClusterId: s.Configuration.ClusterId,
+	clusterId := &grpc_infrastructure_go.ClusterId{
+		ClusterId:      s.Configuration.ClusterId,
 		OrganizationId: s.Configuration.OrganizationId,
 	}
 	go connectivity_checker.CheckClusterConnectivity(connectivityCheckerClient, *clusterAPILoginHelper, clusterId, s.Configuration.ConnectivityCheckPeriod, opClient, s.Configuration)

@@ -29,7 +29,6 @@ spec:
         imagePullPolicy: Always
         args:
           - "run"
-          - "--debug"
           - "--port=8384"
           - "--clusterAPIHostname=$(CLUSTER_API_HOST)"
           - "--clusterAPIPort=443"
