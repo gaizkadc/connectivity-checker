@@ -8,6 +8,9 @@
   "image_list": [
     "connectivity-checker"
   ],
+  "component_list": [
+    "connectivity-checker"
+  ],
   "tools": [
     "k8s",
     "docker"
