@@ -60,7 +60,6 @@ stages:
     - template: misc/nalej-component.yaml@ci_templates
     - template: steps/assets-main.yaml@ci_templates
 
-
 - stage: 'SlackFinish'
   condition: always()
   jobs:
