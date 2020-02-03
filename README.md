@@ -1,17 +1,17 @@
 # connectivity-checker
 
-This repository contains the code for the component connectivity-checker. The component resides in each App Cluster and is in charge of sending `ClusterAlive` checks to the connectivity-manager (residing in the Mngt Cluster.)
+This repository contains the code for the connectivity checker. The component resides in each app cluster and is in charge of sending `ClusterAlive` checks to the `connectivity-manager` (residing in the management cluster.)
 
 ## Getting Started
 
-It takes one parameter:
-* `offlinePolicy`:  it defines the policy that will be triggered when a cluster has lost communication with the Mngt Cluster for a `grace-period` (parameter defined when installing the platform) amount of time. It can be set to `none` or `drain`:
+It has one parameter:
+* `offlinePolicy`:  defines the policy that will be triggered when a cluster has lost communication with the management cluster for a `grace-period` (parameter defined when installing the platform) amount of time. It can be set to `none` or `drain`:
   * `none`: no policy will be triggered.
-  * `drain`: all the applications in the cluster will be removed (a `RemoveAll` signal will be sent to the deployment-manager) regardless of conductor, with which, at this point, should have connectivity.
+  * `drain`: all the applications in the cluster will be removed (a `RemoveAll` signal will be sent to the `deployment-manager`) regardless of `conductor`, with which, at this point, should not have connectivity.
 
 ### Prerequisites
 
-* deployment-manager
+* [`deployment-manager`](https://github.com/nalej/deployment-manager)
 
 ### Build and compile
 
@@ -21,8 +21,7 @@ In order to build and compile this repository use the provided Makefile:
 make all
 ```
 
-This operation generates the binaries for this repo, download dependencies,
-run existing tests and generate ready-to-deploy Kubernetes files.
+This operation generates the binaries for this repo, downloads the required dependencies, runs existing tests and generates ready-to-deploy Kubernetes files.
 
 ### Run tests
 
@@ -55,7 +54,7 @@ Please read [contributing.md](contributing.md) for details on our code of conduc
 
 ## Versioning
 
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/nalej/connectivity-checker/tags). 
+We use [SemVer](http://semver.org/) for versioning. For the available versions, see the [tags on this repository](https://github.com/nalej/connectivity-checker/tags). 
 
 ## Authors
 
